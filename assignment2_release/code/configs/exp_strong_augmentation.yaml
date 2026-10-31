@@ -1,0 +1,32 @@
+# Experiment: Stronger Data Augmentation
+# Based on lecture: More aggressive augmentation improves generalization
+#
+# Changes from default:
+# - img_color_jitter: 0.3 (was 0.15) - 2x stronger color perturbation
+# - img_rotation: 25 (was 15) - more rotation variety
+# - img_min_size: 160 (was 144) - more crop variety
+#
+# Expected: Lower training accuracy, higher validation accuracy
+
+output_folder: "../logs"
+model_type: "CNN"
+dataset:
+  root_folder: "../data"
+
+input:
+  img_min_size: 160
+  img_crop_size: 128
+  img_color_jitter: 0.3
+  img_rotation: 25
+  img_mean: [0.485, 0.456, 0.406]
+  img_std: [0.229, 0.224, 0.225]
+
+opt:
+  type: "SGD"
+  momentum: 0.9
+  weight_decay: 1e-4
+  learning_rate: 0.1
+  epochs: 60
+  warmup: true
+  warmup_epochs: 1
+  schedule_type: "cosine"

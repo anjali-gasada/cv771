@@ -1,0 +1,38 @@
+# Experiment: Best Combined Settings
+# Combines improvements from lecture analysis:
+#
+# Architecture: ImprovedCNN (ResNet-style with BatchNorm + skip connections + DropPath)
+# Training:
+# - Moderate learning rate with extended warmup
+# - Moderate weight decay for regularization
+# - Stronger data augmentation
+# - Cosine annealing schedule
+#
+# Expected: Best overall accuracy (+10-15% over baseline SimpleNet)
+
+output_folder: "../logs"
+model_type: "CNN"
+dataset:
+  root_folder: "../data"
+
+loader:
+  batch_size: 512
+  num_workers: 4
+
+input:
+  img_min_size: 160
+  img_crop_size: 128
+  img_color_jitter: 0.25
+  img_rotation: 20
+  img_mean: [0.485, 0.456, 0.406]
+  img_std: [0.229, 0.224, 0.225]
+
+opt:
+  type: "SGD"
+  momentum: 0.9
+  weight_decay: 3e-4
+  learning_rate: 0.15
+  epochs: 80
+  warmup: true
+  warmup_epochs: 3
+  schedule_type: "cosine"

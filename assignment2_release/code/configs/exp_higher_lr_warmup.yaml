@@ -1,0 +1,23 @@
+# Experiment: Higher Learning Rate with Extended Warmup
+# Based on lecture: Longer warmup enables higher peak LR for faster convergence
+#
+# Changes from default:
+# - learning_rate: 0.2 (was 0.1) - 2x higher peak learning rate
+# - warmup_epochs: 5 (was 1) - 5x longer warmup for stability
+#
+# Expected: Faster convergence to similar accuracy
+
+output_folder: "../logs"
+model_type: "CNN"
+dataset:
+  root_folder: "../data"
+
+opt:
+  type: "SGD"
+  momentum: 0.9
+  weight_decay: 1e-4
+  learning_rate: 0.2
+  epochs: 60
+  warmup: true
+  warmup_epochs: 5
+  schedule_type: "cosine"

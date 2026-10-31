@@ -1,0 +1,26 @@
+# Experiment: Step Decay Learning Rate Schedule
+# Based on lecture: Classic approach used in VGG/ResNet papers
+#
+# Changes from default:
+# - schedule_type: "multistep" (was "cosine")
+# - schedule_steps: [20, 40] - drop LR at epochs 20 and 40
+# - schedule_gamma: 0.1 - multiply LR by 0.1 at each step
+#
+# Expected: See accuracy jumps after LR drops; good for debugging
+
+output_folder: "../logs"
+model_type: "CNN"
+dataset:
+  root_folder: "../data"
+
+opt:
+  type: "SGD"
+  momentum: 0.9
+  weight_decay: 1e-4
+  learning_rate: 0.1
+  epochs: 60
+  warmup: true
+  warmup_epochs: 1
+  schedule_type: "multistep"
+  schedule_steps: [20, 40]
+  schedule_gamma: 0.1
