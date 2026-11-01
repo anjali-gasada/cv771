@@ -119,13 +119,25 @@ class SimpleNetBN(nn.Module):
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(512, num_classes)
 
-    def reset_parameters(self):
+        # Initialize weights with He initialization
+        self._initialize_weights()
+
+    def _initialize_weights(self):
+        """
+        He Initialization (from lecture):
+        - For ReLU: use fan_out mode with gain = sqrt(2)
+        - Prevents vanishing/exploding gradients at initialization
+        """
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
             elif isinstance(m, nn.BatchNorm2d):
                 nn.init.constant_(m.weight, 1.0)
                 nn.init.constant_(m.bias, 0.0)
+            elif isinstance(m, nn.Linear):
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0.0)
 
     def forward(self, x):
         x = self.features(x)
@@ -227,13 +239,23 @@ class ImprovedCNN(nn.Module):
         return nn.Sequential(*layers)
 
     def _initialize_weights(self):
+        """
+        He Initialization (from lecture):
+        - For ReLU networks, use Kaiming/He initialization
+        - Conv2d: fan_out mode preserves variance in forward pass
+        - BatchNorm: weight=1, bias=0 (identity transform initially)
+        - Linear: same as Conv2d for consistency
+        """
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                # He initialization for ReLU
                 nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
             elif isinstance(m, nn.BatchNorm2d):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.Linear):
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
 
     def forward(self, x):
         x = self.stem(x)
@@ -340,12 +362,19 @@ class InceptionNet(nn.Module):
         self._initialize_weights()
 
     def _initialize_weights(self):
+        """
+        He Initialization for all layers.
+        """
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
             elif isinstance(m, nn.BatchNorm2d):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.Linear):
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
 
     def forward(self, x):
         x = self.stem(x)
@@ -369,7 +398,15 @@ class InceptionNet(nn.Module):
 #   - ImprovedCNN: ResNet-style with BatchNorm + skip connections + DropPath
 #   - InceptionNet: Multi-scale parallel branches
 # ============================================================================
-default_cnn_model = ImprovedCNN
+# ============================================================================
+# CHANGE THIS TO SELECT YOUR MODEL!
+# Options:
+#   - SimpleNet: Original baseline (no BatchNorm, no skip connections)
+#   - SimpleNetBN: Baseline + BatchNorm (+2-5% expected)
+#   - ImprovedCNN: ResNet-style with BatchNorm + skip connections + DropPath (+10-15% expected)
+#   - InceptionNet: Multi-scale parallel branches
+# ============================================================================
+default_cnn_model = SimpleNet
 
 ################################################################################
 # Part I.3: Understanding self-attention and Transformer block
